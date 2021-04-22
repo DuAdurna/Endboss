@@ -42,12 +42,13 @@ class gameData:
             "Kilian": 76561198059004685,
         }
 
-    def addGame(self, appId):
+    def addGame(self, appId, spieler):
         try:
             faileintrag = {"ID": appId, "response": {str(appId): {"success": False}}}
             if faileintrag in self.faillist:
-                return ("game in Faillist vorhanden")
-            return (self.games[str(appId)])
+                print("game in Faillist vorhanden")
+                return
+            return (self.games[spieler][str(appId)])
         except KeyError:
             # schaue daten über app in steam api nach.
             parameter = {"appids": str(appId)}
@@ -78,12 +79,17 @@ class gameData:
                         isRemoteplay = True
             except KeyError:
                 pass
-            self.games[str(appId)] = {
+            try:
+                self.games[spieler]
+            except KeyError:
+                self.games[spieler] = {}
+
+            self.games[spieler][str(appId)] = {
                 "name": gameName,
                 "mPlayer": isMultiplayer,
                 "remotePlay": isRemoteplay
             }
-            return self.games[str(appId)]
+            return self.games[spieler][str(appId)]
 
     def save(self, gameDataName="gameData.json", failDataName="requestFails.json"):
         with open(gameDataName, "w") as gameSaveDatei:
@@ -91,9 +97,24 @@ class gameData:
         with open(failDataName, "w") as failDataDatei:
             json.dump(self.faillist, failDataDatei)
 
-    def addGameByHand(self, player, gameName=None, mPlayer=None, remotePlay=None):
+    def addGameByHand(self, player=None, gameName=None):
         """AddGameByHand soll der Liste ein spiel hinzufügen, obwohl dieses nicht bei Steam ist! wichtig ist hier,
-        dass wir das ganze so gestalten dass wir Datenqualität haben und """
+        dass wir das ganze so gestalten dass wir Datenqualität haben und player bitte als Liste
+        Spiel per hand adden removed eds aus der faillliste
+        """
+        if player is None:
+            print("Please select a Player")
+            return
+        if gameName is None:
+            print("Please select a Game")
+            return
+        for spieler in player:
+            self.games[spieler][gameName] = {
+                "name": gameName,
+                "mPlayer": True,
+                "remotePlay": False
+                }
+
 
     def generateParamsPerPerson(self):
         self.paramsPerPerson = {}
@@ -132,10 +153,11 @@ masterGameList = persGameList[ausgewaehlteSpieler[0]]
 for listePerson in persGameList:
     masterGameList = list(set(masterGameList) & set(persGameList[listePerson]))
 
-counter = 0
+
 for person in ausgewaehlteSpieler:
+    counter = 0
     for game in persGameList[person]:
-        spieleDaten.addGame(game)
+        spieleDaten.addGame(game,person)
         counter = counter + 1
         print("index: " + str(counter) + " von " + str(len(persGameList[person])) + " von " + person)
         if counter % 31 == 0:
@@ -148,7 +170,6 @@ print(masterGameList)
 print(persGameList)
 
 """ Spiele die per ahnd hinzugefügt werden müssen:
-Dying light, Overwatch, Lol, Scribble Io, Gartic Phone, Factorio (maid), minecraft
-
+Dying light, Overwatch, Lol, Scribble Io, Gartic Phone, Factorio (maid), minecraft, warcraft 3
 
 """
