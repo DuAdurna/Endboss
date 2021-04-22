@@ -1,8 +1,13 @@
 import requests
 import json
 import time
+from colorama import Fore, Back, Style
 
 
+# print(list(spieleDaten.games.values()))
+# print(Fore.BLUE + str(str((list(spiele.games.values())[-1])).rsplit(',1)[0]).split(':',1)[1])
+#  print(Fore.RED + ("Game " + str(counter) + " von " + str(len(masterGameList)) + " wurde hinzugefuegt&quot)
+# print(Style.RESET_ALL)
 class gameData:
     """gmae Data ist eine Liste der SPiele für die Daten gesammelt werden. Diese werden aus einem File geladen und da
     wieder rein gepackt. zusätzlich kann für eine gegebene AppId der steam API ein Game Nachgeschaut werden und falls
@@ -136,8 +141,14 @@ counter = 0
 for person in ausgewaehlteSpieler:
     for game in persGameList[person]:
         spieleDaten.addGame(game)
+
+        print(Fore.BLUE + str(str(list(spieleDaten.games.values())[-1]).rsplit(',')[0]).split(':',1)[1])
+
+        print(Fore.RED + "index: " + str(counter) + " von " + str(len(persGameList[person])) + " von " + person)
         counter = counter + 1
-        print("index: " + str(counter) + " von " + str(len(persGameList[person])) + " von " + person)
+        if counter == len(persGameList[person]):
+            counter = 0
+        print(Style.RESET_ALL)
         if counter % 31 == 0:
             spieleDaten.save()
             print("ich habe zwischengespeichert")
