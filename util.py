@@ -146,7 +146,7 @@ for person in ausgewaehlteSpieler:
 spieleDaten.save()
 print(masterGameList)
 print(persGameList)
-
+print('penis')
 """ Spiele die per ahnd hinzugefügt werden müssen:
 Dying light, Overwatch, Lol, Scribble Io, Gartic Phone, Factorio (maid), minecraft
 
