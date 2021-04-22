@@ -112,6 +112,10 @@ class gameData:
             print("Please select a Game")
             return
         for spieler in player:
+            try:
+                self.games[spieler]
+            except KeyError:
+                self.games[spieler] = {}
             self.games[spieler][gameName] = {
                 "name": gameName,
                 "mPlayer": True,
@@ -155,6 +159,7 @@ masterGameList = persGameList[ausgewaehlteSpieler[0]]
 for listePerson in persGameList:
     masterGameList = list(set(masterGameList) & set(persGameList[listePerson]))
 
+spieleDaten.addGameByHand(["Manu","Dome", "Maido", "Felix"], "Dying Light")
 counter = 0
 for person in ausgewaehlteSpieler:
     for game in persGameList[person]:
@@ -176,6 +181,7 @@ spieleDaten.save()
 print(masterGameList)
 print(persGameList)
 print('penis')
+spieleDaten.addGameByHand(["Manu","Dome", "Maido", "Felix"], "Dying Light")
 """ Spiele die per ahnd hinzugefügt werden müssen:
 Dying light, Overwatch, Lol, Scribble Io, Gartic Phone, Factorio (maid), minecraft
 
