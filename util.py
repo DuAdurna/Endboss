@@ -160,7 +160,7 @@ for person in ausgewaehlteSpieler:
     for game in persGameList[person]:
         spieleDaten.addGame(game,person)
 
-        print(Fore.BLUE + str(str(list(spieleDaten.games.values())[-1]).rsplit(',')[0]).split(':',1)[1])
+        print(Fore.BLUE + str(str(str(str(list(spieleDaten.games.values())[-1]).rsplit(',')[0]).split(':',1)[1].split(':',1)[1]).strip()))
 
         print(Fore.RED + "index: " + str(counter) + " von " + str(len(persGameList[person])) + " von " + person)
         counter = counter + 1
