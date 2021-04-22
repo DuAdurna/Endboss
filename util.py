@@ -47,12 +47,13 @@ class gameData:
             "Kilian": 76561198059004685,
         }
 
-    def addGame(self, appId):
+    def addGame(self, appId, spieler):
         try:
             faileintrag = {"ID": appId, "response": {str(appId): {"success": False}}}
             if faileintrag in self.faillist:
-                return ("game in Faillist vorhanden")
-            return (self.games[str(appId)])
+                print("game in Faillist vorhanden")
+                return
+            return (self.games[spieler][str(appId)])
         except KeyError:
             # schaue daten über app in steam api nach.
             parameter = {"appids": str(appId)}
@@ -83,12 +84,17 @@ class gameData:
                         isRemoteplay = True
             except KeyError:
                 pass
-            self.games[str(appId)] = {
+            try:
+                self.games[spieler]
+            except KeyError:
+                self.games[spieler] = {}
+
+            self.games[spieler][str(appId)] = {
                 "name": gameName,
                 "mPlayer": isMultiplayer,
                 "remotePlay": isRemoteplay
             }
-            return self.games[str(appId)]
+            return self.games[spieler][str(appId)]
 
     def save(self, gameDataName="gameData.json", failDataName="requestFails.json"):
         with open(gameDataName, "w") as gameSaveDatei:
@@ -99,6 +105,18 @@ class gameData:
     def addGameByHand(self, player, gameName=None, mPlayer=None, remotePlay=None):
         """AddGameByHand soll der Liste ein spiel hinzufügen, obwohl dieses nicht bei Steam ist! wichtig ist hier,
         dass wir das ganze so gestalten dass wir Datenqualität haben und """
+        if player is None:
+            print("Please select a Player")
+            return
+        if gameName is None:
+            print("Please select a Game")
+            return
+        for spieler in player:
+            self.games[spieler][gameName] = {
+                "name": gameName,
+                "mPlayer": True,
+                "remotePlay": False
+                }
 
     def generateParamsPerPerson(self):
         self.paramsPerPerson = {}
@@ -140,7 +158,7 @@ for listePerson in persGameList:
 counter = 0
 for person in ausgewaehlteSpieler:
     for game in persGameList[person]:
-        spieleDaten.addGame(game)
+        spieleDaten.addGame(game,person)
 
         print(Fore.BLUE + str(str(list(spieleDaten.games.values())[-1]).rsplit(',')[0]).split(':',1)[1])
 
