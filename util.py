@@ -1,7 +1,7 @@
 import requests
 import json
 import time
-from colorama import Fore, Back, Style
+from colorama import Fore, Style
 
 
 # print(list(spieleDaten.games.values()))
@@ -45,24 +45,23 @@ class gameData:
             "Simon": 76561199050767225,
             "Leon": 76561198052633626,
             "Kilian": 76561198059004685,
+            "Moritz": 76561198097568563,
         }
 
     def addGame(self, appId, spieler):
         try:
             faileintrag = {"ID": appId, "response": {str(appId): {"success": False}}}
             if faileintrag in self.faillist:
-                print("game in Faillist vorhanden")
                 return
             return (self.games[spieler][str(appId)])
         except KeyError:
             # schaue daten über app in steam api nach.
             parameter = {"appids": str(appId)}
-            print("ich requeste grade: " + str(appId))
             gameAPIRequest = requests.get("https://store.steampowered.com/api/appdetails/?", params=parameter)
             gameApiOut = json.loads(gameAPIRequest.content)
             if gameApiOut[str(appId)]["success"] == False:
-                print(str(appId) + " hat gefailt")
-                time.sleep(2)
+                print(str(appId) + " hat gefailt, das kann erwartet sein!")
+                time.sleep(1.2)
                 self.faillist.append(
                     {
                         "ID": appId,
@@ -72,8 +71,7 @@ class gameData:
             gameApiData = gameApiOut[str(appId)]["data"]
             del gameApiOut
             gameName = gameApiData["name"]
-            print("ich warte jetzt, nachdem ich: " + gameName + " angefragt hab")
-            time.sleep(2)
+            time.sleep(1.2)
             isMultiplayer = False
             isRemoteplay = False
             try:
@@ -92,7 +90,8 @@ class gameData:
             self.games[spieler][str(appId)] = {
                 "name": gameName,
                 "mPlayer": isMultiplayer,
-                "remotePlay": isRemoteplay
+                "remotePlay": isRemoteplay,
+                "spielerAnzahl": None
             }
             return self.games[spieler][str(appId)]
 
@@ -102,7 +101,7 @@ class gameData:
         with open(failDataName, "w") as failDataDatei:
             json.dump(self.faillist, failDataDatei)
 
-    def addGameByHand(self, player, gameName=None, mPlayer=None, remotePlay=None):
+    def addGameByHand(self, player, gameName=None, spielerAnzahl=None):
         """AddGameByHand soll der Liste ein spiel hinzufügen, obwohl dieses nicht bei Steam ist! wichtig ist hier,
         dass wir das ganze so gestalten dass wir Datenqualität haben und """
         if player is None:
@@ -119,7 +118,8 @@ class gameData:
             self.games[spieler][gameName] = {
                 "name": gameName,
                 "mPlayer": True,
-                "remotePlay": False
+                "remotePlay": False,
+                "spielerAnzahl": spielerAnzahl
                 }
 
     def generateParamsPerPerson(self):
@@ -131,56 +131,99 @@ class gameData:
                 "include_played_free_games": True
             }
 
+    def getCommonGames(self, ausgewaehlteSpieler=None):
+        #Dies ist dafür da, die überschneidungen zwischen verschiedenen Leuten zu finden und auszugeben
+        if ausgewaehlteSpieler is None:
+            print("Geb halt spieler ein du Horst")
+            return
+        uberschneidungen = list(self.games[ausgewaehlteSpieler[0]].keys())
+        for appid in uberschneidungen:
+            if self.games[ausgewaehlteSpieler[0]][appid]["mPlayer"] is False:
+                uberschneidungen.remove(appid)
+        remoteplayGames = []
+        gemeinsamGames = []
+        for spieler in ausgewaehlteSpieler:
+            uberschneidungen = set (uberschneidungen) & set( self.games[spieler].keys())
+            for game in self.games[spieler]:
+                if self.games[spieler][str(game)]["remotePlay"]:
+                    if self.games[spieler][str(game)]["spielerAnzahl"] is not None:
+                        if self.games[spieler][str(game)]["spielerAnzahl"] >= len(ausgewaehlteSpieler):
+                            remoteplayGames.append(self.games[spieler][str(game)]["name"])
+                    else:
+                        remoteplayGames.append(self.games[spieler][str(game)]["name"])
+        for appid in uberschneidungen:
+            if self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] is not None:
+                if self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] >= len(ausgewaehlteSpieler):
+                    gemeinsamGames.append(self.games[ausgewaehlteSpieler[0]][str(appid)]["name"])
+            else:
+                gemeinsamGames.append(self.games[ausgewaehlteSpieler[0]][str(appid)]["name"])
+        return [gemeinsamGames, remoteplayGames]
+
+    def updateGameData(self, ausgewaehlteSpieler=["Manu","Jan","Simon","Max","Maido","Felix","Dome","Moritz", "Leon", "Kilian"]):
+        """ Lädt die Spiele in die Daten rein, bzw updatet sie"""
+        mnu = "Manu"
+        jan = "Jan"
+        smn = "Simon"
+        max = "Max"
+        mad = "Maido"
+        flx = "Felix"
+        dom = "Dome"
+        mtz = "Moritz"
+        all = [smn, flx, max, jan, mnu, mad, dom, "Leon", "Kilian", mtz]
+        self.addGameByHand([mnu, dom, mad, flx], "Dying Light", 4)
+        self.addGameByHand([mnu, mad, flx, smn, max, jan], "Overwatch", 6)
+        self.addGameByHand([mnu, mad, mtz, jan, flx, smn], "League of Legends", 5)
+        self.addGameByHand([mad], "Factorio", 99)
+        self.addGameByHand(all, "Minecraft", 99)
+        self.addGameByHand(all, "Geoguesser/Geotastic", 99)
+        self.addGameByHand(all, "Gartic Phone", 15)
+
+        persGameList=self.genPersGameList(ausgewaehlteSpieler)
+        gcounter = 0
+        glange = 0
+        start = time.time()
+        for person in ausgewaehlteSpieler:
+            glange = glange + len(persGameList[person])
+        for person in ausgewaehlteSpieler:
+            counter = 1
+            for game in persGameList[person]:
+                self.addGame(game, person)
+                print(Fore.BLUE + list(self.games[person].values())[-1]["name"])
+                print(Fore.RED + "index: " + str(counter) + " (" + str(gcounter + counter) + ")"
+                      + " von " + str(len(persGameList[person])) + " (" + str(glange) + ") von " +
+                      person + "\n" + Style.RESET_ALL)
+                counter = counter + 1
+                if (gcounter + counter) % 53 == 0 or (time.time() - start) > 20:
+                    self.save()
+                    print(Fore.GREEN + "ich habe zwischengespeichert" + Style.RESET_ALL)
+                    start = time.time()
+            gcounter = gcounter + counter
+        self.save()
+        return
+
+    def genPersGameList(self, ausgewaehlteSpieler=None):
+        self.generateParamsPerPerson()
+        persGameList = {}
+        for person in ausgewaehlteSpieler:
+            apiAusspuck = requests.get("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?",
+                                   params=spieleDaten.paramsPerPerson[person])
+            gamesImBesitz = json.loads(apiAusspuck.content)
+            persGameList[person] = []
+        for game in gamesImBesitz["response"]["games"]:
+            # erstellt eine liste welche spiele Jeder hat
+            persGameList[person].append(game["appid"])
+
+        return persGameList
+
+
+
 
 """
 ------------------------Testcode Unter dieser Linie--------------------------------------------------------------------
 """
 
 spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
-paramsPerPerson = spieleDaten.generateParamsPerPerson()
 
-ausgewaehlteSpieler = ["Simon", "Felix", "Max", "Jan", "Manu", "Maido", "Maido²", "Dome", "Leon", "Kilian"]
-
-
-persGameList = {}
-# Erstellen einer Liste welche Person Welche Spiele hat.
-for person in ausgewaehlteSpieler:
-    apiAusspuck = requests.get(
-        "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?",
-        params=spieleDaten.paramsPerPerson[person])
-    gamesImBesitz = json.loads(apiAusspuck.content)
-    persGameList[person] = []
-    for game in gamesImBesitz["response"]["games"]:
-        # erstellt eine liste welche spiele Jeder hat
-        persGameList[person].append(game["appid"])
-
-# sortieren in Remote play games und nicht remoteplay
-masterGameList = persGameList[ausgewaehlteSpieler[0]]
-for listePerson in persGameList:
-    masterGameList = list(set(masterGameList) & set(persGameList[listePerson]))
-
-spieleDaten.addGameByHand(["Manu","Dome", "Maido", "Felix"], "Dying Light")
-gcounter=0
-for person in ausgewaehlteSpieler:
-    counter = 0
-    for game in persGameList[person]:
-        spieleDaten.addGame(game,person)
-        print(Fore.BLUE + list(spieleDaten.games[person].values())[-1]["name"])
-        print(Fore.RED + "index: " + str(counter) + "(" + str(gcounter+counter)+ ")"
-              + " von " + str(len(persGameList[person])) + " von " + person+ "\n" +Style.RESET_ALL)
-        counter = counter + 1
-        if counter % 31 == 0:
-            spieleDaten.save()
-            print("ich habe zwischengespeichert")
-    gcounter=gcounter+counter
-
-
-
-spieleDaten.save()
-print(masterGameList)
-print(persGameList)
-print('penis')
-spieleDaten.addGameByHand(["Manu","Dome", "Maido", "Felix"], "Dying Light")
-""" Spiele die per ahnd hinzugefügt werden müssen:
-Dying light, Overwatch, Lol, Scribble Io, Gartic Phone, Factorio (maid), minecraft, geoguessr / geotastic
-"""
+ausgewaehlteSpieler = ["Manu","Jan","Simon","Max","Maido","Felix","Dome","Moritz", "Leon", "Kilian"]
+spieleDaten.updateGameData()
+print(spieleDaten.getCommonGames(ausgewaehlteSpieler))
