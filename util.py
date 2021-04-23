@@ -160,21 +160,20 @@ for listePerson in persGameList:
     masterGameList = list(set(masterGameList) & set(persGameList[listePerson]))
 
 spieleDaten.addGameByHand(["Manu","Dome", "Maido", "Felix"], "Dying Light")
-counter = 0
+gcounter=0
 for person in ausgewaehlteSpieler:
+    counter = 0
     for game in persGameList[person]:
         spieleDaten.addGame(game,person)
-
         print(Fore.BLUE + list(spieleDaten.games[person].values())[-1]["name"])
-
-        print(Fore.RED + "index: " + str(counter) + " von " + str(len(persGameList[person])) + " von " + person)
+        print(Fore.RED + "index: " + str(counter) + "(" + str(gcounter+counter)+ ")"
+              + " von " + str(len(persGameList[person])) + " von " + person+ "\n" +Style.RESET_ALL)
         counter = counter + 1
-        if counter == len(persGameList[person]):
-            counter = 0
-        print(Style.RESET_ALL)
         if counter % 31 == 0:
             spieleDaten.save()
             print("ich habe zwischengespeichert")
+    gcounter=gcounter+counter
+
 
 
 spieleDaten.save()
