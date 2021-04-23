@@ -120,7 +120,7 @@ class gameData:
                 "mPlayer": True,
                 "remotePlay": False,
                 "spielerAnzahl": spielerAnzahl
-                }
+            }
 
     def generateParamsPerPerson(self):
         self.paramsPerPerson = {}
@@ -132,7 +132,7 @@ class gameData:
             }
 
     def getCommonGames(self, ausgewaehlteSpieler=None):
-        #Dies ist dafür da, die überschneidungen zwischen verschiedenen Leuten zu finden und auszugeben
+        # Dies ist dafür da, die überschneidungen zwischen verschiedenen Leuten zu finden und auszugeben
         if ausgewaehlteSpieler is None:
             print("Geb halt spieler ein du Horst")
             return
@@ -143,7 +143,7 @@ class gameData:
         remoteplayGames = []
         gemeinsamGames = []
         for spieler in ausgewaehlteSpieler:
-            uberschneidungen = set (uberschneidungen) & set( self.games[spieler].keys())
+            uberschneidungen = set(uberschneidungen) & set(self.games[spieler].keys())
             for game in self.games[spieler]:
                 if self.games[spieler][str(game)]["remotePlay"]:
                     if self.games[spieler][str(game)]["spielerAnzahl"] is not None:
@@ -159,7 +159,9 @@ class gameData:
                 gemeinsamGames.append(self.games[ausgewaehlteSpieler[0]][str(appid)]["name"])
         return [gemeinsamGames, remoteplayGames]
 
-    def updateGameData(self, ausgewaehlteSpieler=["Manu","Jan","Simon","Max","Maido","Felix","Dome","Moritz", "Leon", "Kilian"]):
+    def updateGameData(self,
+                       ausgewaehlteSpieler=["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon",
+                                            "Kilian"]):
         """ Lädt die Spiele in die Daten rein, bzw updatet sie"""
         mnu = "Manu"
         jan = "Jan"
@@ -178,7 +180,7 @@ class gameData:
         self.addGameByHand(all, "Geoguesser/Geotastic", 99)
         self.addGameByHand(all, "Gartic Phone", 15)
 
-        persGameList=self.genPersGameList(ausgewaehlteSpieler)
+        persGameList = self.genPersGameList(ausgewaehlteSpieler)
         gcounter = 0
         glange = 0
         start = time.time()
@@ -206,7 +208,7 @@ class gameData:
         persGameList = {}
         for person in ausgewaehlteSpieler:
             apiAusspuck = requests.get("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?",
-                                   params=spieleDaten.paramsPerPerson[person])
+                                       params=spieleDaten.paramsPerPerson[person])
             gamesImBesitz = json.loads(apiAusspuck.content)
             persGameList[person] = []
         for game in gamesImBesitz["response"]["games"]:
@@ -215,7 +217,44 @@ class gameData:
 
         return persGameList
 
+    def spielerAnzahltEintragen(self):
+        for spieler in self.games:
+            for game in self.games[spieler]:
+                if (self.games[spieler][game]["mPlayer"] or self.games[spieler][game]["remotePlay"]) and \
+                        self.games[spieler][game]["spielerAnzahl"] is None:
+                    erfolg = self.getAnzahlSpieler(self.games[spieler][game]["name"])
+                    if erfolg is None:
+                        spielerAzahl = input(
+                            "Spieleranzahl von " + self.games[spieler][game]["name"] + " eintragen (remoteplay: " + str(
+                                self.games[spieler][game]["remotePlay"]) + "): ")
+                        if spielerAzahl == "q":
+                            self.save()
+                            return
+                        if spielerAzahl == "?":
+                            pass
+                        else:
+                            self.games[spieler][game]["spielerAnzahl"] = int(spielerAzahl)
+                            self.save()
+                    else:
+                        print("spieleranzahl gefunden für: " + self.games[spieler][game]["name"])
+                        self.games[spieler][game]["spielerAnzahl"] = erfolg
 
+
+    def editAnzahlSpieler(self, gameName, neueZahl):
+        for spieler in self.games:
+            for game in self.games[spieler]:
+                if self.games[spieler][game]["name"] == gameName:
+                    self.games[spieler][game]["spielerAnzahl"] = neueZahl
+                    print("spieleranzahl von Spiel " + str(gameName) +" auf " + str(neueZahl) + " geändert!" )
+                    self.save
+        return
+
+    def getAnzahlSpieler(self, gameName):
+        for spieler in self.games:
+            for game in self.games[spieler]:
+                if self.games[spieler][game]["name"] == gameName and \
+                    self.games[spieler][game]["spielerAnzahl"] is not None:
+                    return self.games[spieler][game]["spielerAnzahl"]
 
 
 """
@@ -224,6 +263,8 @@ class gameData:
 
 spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
 
-ausgewaehlteSpieler = ["Manu","Jan","Simon","Max","Maido","Felix","Dome","Moritz", "Leon", "Kilian"]
+ausgewaehlteSpieler = ["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon", "Kilian"]
 spieleDaten.updateGameData()
+spieleDaten.spielerAnzahltEintragen()
 print(spieleDaten.getCommonGames(ausgewaehlteSpieler))
+
