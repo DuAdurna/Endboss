@@ -239,7 +239,6 @@ class gameData:
                         print("spieleranzahl gefunden für: " + self.games[spieler][game]["name"])
                         self.games[spieler][game]["spielerAnzahl"] = erfolg
 
-
     def editAnzahlSpieler(self, gameName, neueZahl):
         for spieler in self.games:
             for game in self.games[spieler]:
@@ -264,7 +263,8 @@ class gameData:
 spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
 
 ausgewaehlteSpieler = ["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon", "Kilian"]
-spieleDaten.updateGameData()
-spieleDaten.spielerAnzahltEintragen()
-print(spieleDaten.getCommonGames(ausgewaehlteSpieler))
+print(spieleDaten.getCommonGames(["Max", "Manu","Dome", "Moritz", "Maido","Jan"]))
+#is installed in API?
+#maids factorio
+#überschneidungen mit spielerzahl abgleichen
 
