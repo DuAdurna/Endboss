@@ -2,6 +2,7 @@ import requests
 import json
 import time
 from colorama import Fore, Style
+import pyperclip
 
 
 # print(list(spieleDaten.games.values()))
@@ -220,13 +221,14 @@ class gameData:
 
         return persGameList
 
-    def spielerAnzahltEintragen(self):
+    def spielerAnzahlEintragen(self):
         for spieler in self.games:
             for game in self.games[spieler]:
                 if (self.games[spieler][game]["mPlayer"] or self.games[spieler][game]["remotePlay"]) and \
                         self.games[spieler][game]["spielerAnzahl"] is None:
                     erfolg = self.getAnzahlSpieler(self.games[spieler][game]["name"])
                     if erfolg is None:
+                        pyperclip.copy(self.games[spieler][game]["name"])
                         spielerAzahl = input(
                             "Spieleranzahl von " + self.games[spieler][game]["name"] + " eintragen (remoteplay: " + str(
                                 self.games[spieler][game]["remotePlay"]) + "): ")
@@ -263,11 +265,8 @@ class gameData:
 ------------------------Testcode Unter dieser Linie--------------------------------------------------------------------
 """
 
-#spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
-
-#ausgewaehlteSpieler = ["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon", "Kilian"]
-#print(spieleDaten.getCommonGames(["Max", "Manu","Dome", "Moritz", "Maido","Jan"]))
-
+spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
+spieleDaten.spielerAnzahlEintragen()
 
 #is installed in API?
 #maids factorio

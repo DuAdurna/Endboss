@@ -2,7 +2,7 @@
 import _tkinter
 import tkinter as tk
 from tkinter import ttk
-from util import *
+from util import gameData
 import pyperclip
 
 # Create the window
@@ -204,9 +204,6 @@ def insertData(DATA):
     parent = treeview.insert(parent='', index='end', iid=2, text="Remote Play Games")
     for x in DATA[1]:
         treeview.insert(2, tk.END, text=x)
-
-
-
 
 
 # Copy games to clipboard
