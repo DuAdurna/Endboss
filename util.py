@@ -48,6 +48,9 @@ class gameData:
             "Moritz": 76561198097568563,
         }
 
+    def giveGames(self):
+        return self.games
+
     def addGame(self, appId, spieler):
         try:
             faileintrag = {"ID": appId, "response": {str(appId): {"success": False}}}
@@ -150,7 +153,7 @@ class gameData:
                         if self.games[spieler][str(game)]["spielerAnzahl"] >= len(ausgewaehlteSpieler):
                             remoteplayGames.append(self.games[spieler][str(game)]["name"])
                     else:
-                        remoteplayGames.append(self.games[spieler][str(game)]["name"])
+                        remoteplayGames.append(self.games[spieler][str(game)]["name"])  #schon mal was von cases gehoert?:D
         for appid in uberschneidungen:
             if self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] is not None:
                 if self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] >= len(ausgewaehlteSpieler):
@@ -260,10 +263,12 @@ class gameData:
 ------------------------Testcode Unter dieser Linie--------------------------------------------------------------------
 """
 
-spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
+#spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
 
-ausgewaehlteSpieler = ["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon", "Kilian"]
-print(spieleDaten.getCommonGames(["Max", "Manu","Dome", "Moritz", "Maido","Jan"]))
+#ausgewaehlteSpieler = ["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon", "Kilian"]
+#print(spieleDaten.getCommonGames(["Max", "Manu","Dome", "Moritz", "Maido","Jan"]))
+
+
 #is installed in API?
 #maids factorio
 #überschneidungen mit spielerzahl abgleichen
