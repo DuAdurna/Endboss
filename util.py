@@ -41,7 +41,6 @@ class gameData:
             "Max": 76561198293306869,
             "Manu": 76561198117034035,
             "Maido": 76561198215794857,
-            "Maido²": 76561198040993319,
             "Dome": 76561198036790611,
             "Simon": 76561199050767225,
             "Leon": 76561198052633626,
@@ -215,7 +214,7 @@ class gameData:
         persGameList = {}
         for person in ausgewaehlteSpieler:
             apiAusspuck = requests.get("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?",
-                                       params=spieleDaten.paramsPerPerson[person])
+                                       params=self.paramsPerPerson[person])
             gamesImBesitz = json.loads(apiAusspuck.content)
             persGameList[person] = []
         for game in gamesImBesitz["response"]["games"]:
@@ -268,9 +267,7 @@ class gameData:
 ------------------------Testcode Unter dieser Linie--------------------------------------------------------------------
 """
 
-spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
-spieleDaten.spielerAnzahlEintragen()
-spieleDaten.save()
+#gewichten
 #is installed in API?
-#überschneidungen mit spielerzahl abgleichen
+
 

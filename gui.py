@@ -1,5 +1,4 @@
 # Importing tkinter,tkinter.ttk and utilities
-import _tkinter
 import tkinter as tk
 from tkinter import ttk
 from util import gameData
