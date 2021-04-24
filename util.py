@@ -267,7 +267,7 @@ class gameData:
 
 spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
 spieleDaten.spielerAnzahlEintragen()
-
+spieleDaten.save()
 #is installed in API?
 #maids factorio
 #überschneidungen mit spielerzahl abgleichen
