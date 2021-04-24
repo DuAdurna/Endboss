@@ -142,8 +142,11 @@ class gameData:
             return
         uberschneidungen = list(self.games[ausgewaehlteSpieler[0]].keys())
         for appid in uberschneidungen:
-            if self.games[ausgewaehlteSpieler[0]][appid]["mPlayer"] is False:
+            if self.games[ausgewaehlteSpieler[0]][str(appid)]["mPlayer"] is False:
                 uberschneidungen.remove(appid)
+            if self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] is not None:
+                if self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] < len(ausgewaehlteSpieler):
+                    uberschneidungen.remove(appid)
         remoteplayGames = []
         gemeinsamGames = []
         for spieler in ausgewaehlteSpieler:
@@ -269,6 +272,5 @@ spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.
 spieleDaten.spielerAnzahlEintragen()
 spieleDaten.save()
 #is installed in API?
-#maids factorio
 #überschneidungen mit spielerzahl abgleichen
 
