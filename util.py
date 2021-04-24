@@ -143,7 +143,7 @@ class gameData:
         for appid in uberschneidungen:
             if self.games[ausgewaehlteSpieler[0]][str(appid)]["mPlayer"] is False:
                 uberschneidungen.remove(appid)
-            if self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] is not None:
+            elif self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] is not None:
                 if self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] < len(ausgewaehlteSpieler):
                     uberschneidungen.remove(appid)
         remoteplayGames = []
@@ -153,20 +153,23 @@ class gameData:
             for game in self.games[spieler]:
                 if self.games[spieler][str(game)]["remotePlay"]:
                     if self.games[spieler][str(game)]["spielerAnzahl"] is not None:
-                        if self.games[spieler][str(game)]["spielerAnzahl"] >= len(ausgewaehlteSpieler):
+                        if self.games[spieler][str(game)]["spielerAnzahl"] >= len(ausgewaehlteSpieler) \
+                            and self.games[spieler][str(game)]["name"] not in remoteplayGames:
                             remoteplayGames.append(self.games[spieler][str(game)]["name"])
-                    else:
-                        remoteplayGames.append(self.games[spieler][str(game)]["name"])  #schon mal was von cases gehoert?:D
+                    elif self.games[spieler][str(game)]["name"] not in remoteplayGames:
+                        remoteplayGames.append(self.games[spieler][str(game)]["name"])
+                        #schon mal was von cases gehoert?:D hier müsste ich die aussagen mit AND verbinden aber fande das so übersichtlicher, cases bringen nix :P
         for appid in uberschneidungen:
             if self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] is not None:
                 if self.games[ausgewaehlteSpieler[0]][str(appid)]["spielerAnzahl"] >= len(ausgewaehlteSpieler):
                     gemeinsamGames.append(self.games[ausgewaehlteSpieler[0]][str(appid)]["name"])
             else:
                 gemeinsamGames.append(self.games[ausgewaehlteSpieler[0]][str(appid)]["name"])
+        gemeinsamGames.sort()
+        remoteplayGames.sort()
         return [gemeinsamGames, remoteplayGames]
 
-    def updateGameData(self,
-                       ausgewaehlteSpieler=["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon",
+    def updateGameData(self,ausgewaehlteSpieler=["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon",
                                             "Kilian"]):
         """ Lädt die Spiele in die Daten rein, bzw updatet sie"""
         mnu = "Manu"
@@ -267,6 +270,11 @@ class gameData:
 ------------------------Testcode Unter dieser Linie--------------------------------------------------------------------
 """
 
+"""
+spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
+spieleDaten.editAnzahlSpieler("Contagion", 0)
+spieleDaten.save()
+"""
 #gewichten
 #is installed in API?
 
