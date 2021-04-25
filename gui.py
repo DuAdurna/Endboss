@@ -214,7 +214,7 @@ def copyGamestoCB(*data):
 def accentCallback():
     if ausgewaehlteSpieler:
         spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
-        DATA = spieleDaten.getRankedGames(ausgewaehlteSpieler,False)
+        DATA = spieleDaten.getRankedGames(ausgewaehlteSpieler,False) #wenn hier false steht wird gesamtspielzeit als ranking genutzt
         insertData(DATA)
         print(DATA)
         if (z.get() == 1):

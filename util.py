@@ -271,6 +271,8 @@ class gameData:
         self.generateParamsPerPerson()
         rankingListRecent = {}
         rankingListEver = {}
+        remoterankingListRecent = {}
+        remoterankingListEver = {}
         for person in ausgewaehlteSpieler:
             apiAusspuck = requests.get(
                 "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?",
@@ -296,8 +298,25 @@ class gameData:
                         rankingListEver[game["name"]] = rankingListEver[game["name"]] + game["playtime_forever"]
                     except KeyError:
                         pass
-        rankingListRecent = dict(sorted(rankingListRecent.items(), key=lambda item: item[1], reverse=True))
-        rankingListEver = dict(sorted(rankingListEver.items(), key=lambda item: item[1], reverse=True))
+                if game["name"] in commonGames[1]:
+                    # hier kumulativ die spielstunden errechen! (remoteplay games)
+                    try:
+                        remoterankingListRecent[game["name"]]
+                    except KeyError:
+                        remoterankingListRecent[game["name"]] = 0
+                    try:
+                        remoterankingListRecent[game["name"]] = remoterankingListRecent[game["name"]] + game["playtime_2weeks"]
+                    except KeyError:
+                        pass
+                    try:
+                        remoterankingListEver[game["name"]]
+                    except KeyError:
+                        remoterankingListEver[game["name"]] = 0
+                    try:
+                        remoterankingListEver[game["name"]] = remoterankingListEver[game["name"]] + game["playtime_forever"]
+                    except KeyError:
+                        pass
+        #spiele die nicht in steam sind werden besser als 0 bewertet :D
         for game in commonGames[0]:
             try:
                 rankingListEver[game]
@@ -308,10 +327,16 @@ class gameData:
             except KeyError:
                 rankingListRecent[game] = 120*len(ausgewaehlteSpieler)
 
+        #rankings sortieren
+        rankingListRecent = dict(sorted(rankingListRecent.items(), key=lambda item: item[1], reverse=True))
+        rankingListEver = dict(sorted(rankingListEver.items(), key=lambda item: item[1], reverse=True))
+        remoterankingListRecent = dict(sorted(remoterankingListRecent.items(), key=lambda item: item[1], reverse=True))
+        remoterankingListEver = dict(sorted(remoterankingListEver.items(), key=lambda item: item[1], reverse=True))
+        #output entsprechend der wünsche anpassen (hatte keine lust alles in if zu packen deswegen wird immer beides berechnet
         if recent:
-            return [rankingListRecent, commonGames[1]]
+            return [rankingListRecent, remoterankingListRecent]
         else:
-            return [rankingListEver, commonGames[1]]
+            return [rankingListEver, remoterankingListEver]
 
 
 
@@ -321,12 +346,11 @@ class gameData:
 ------------------------Testcode Unter dieser Linie--------------------------------------------------------------------
 """
 
-#"""
+"""
 spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
 #spieleDaten.editAnzahlSpieler("Contagion", 0)
-spieleDaten.getRankedGames(["Manu", "Jan","Maido", "Felix"])
 spieleDaten.save()
-#"""
+"""
 
 #gewichten
 #is installed in API?
