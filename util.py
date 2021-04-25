@@ -131,7 +131,8 @@ class gameData:
             self.paramsPerPerson[person] = {
                 "key": self.key,
                 "steamid": str(self.steamIds[person]),  # beachte steam ids werden als zahl gehandelt
-                "include_played_free_games": True
+                "include_played_free_games": True,
+                "include_appinfo": True
             }
 
     def getCommonGames(self, ausgewaehlteSpieler=None):
@@ -220,9 +221,9 @@ class gameData:
                                        params=self.paramsPerPerson[person])
             gamesImBesitz = json.loads(apiAusspuck.content)
             persGameList[person] = []
-        for game in gamesImBesitz["response"]["games"]:
-            # erstellt eine liste welche spiele Jeder hat
-            persGameList[person].append(game["appid"])
+            for game in gamesImBesitz["response"]["games"]:
+                # erstellt eine liste welche spiele Jeder hat
+                persGameList[person].append(game["appid"])
 
         return persGameList
 
@@ -254,7 +255,7 @@ class gameData:
             for game in self.games[spieler]:
                 if self.games[spieler][game]["name"] == gameName:
                     self.games[spieler][game]["spielerAnzahl"] = neueZahl
-                    print("spieleranzahl von Spiel " + str(gameName) +" auf " + str(neueZahl) + " geändert!" )
+                    print("Spieleranzahl von Spiel " + str(gameName) +" auf " + str(neueZahl) + " geändert!" )
                     self.save
         return
 
@@ -265,16 +266,68 @@ class gameData:
                     self.games[spieler][game]["spielerAnzahl"] is not None:
                     return self.games[spieler][game]["spielerAnzahl"]
 
+    def getRankedGames(self, ausgewaehlteSpieler=None, recent=True):
+        commonGames = self.getCommonGames(ausgewaehlteSpieler)
+        self.generateParamsPerPerson()
+        rankingListRecent = {}
+        rankingListEver = {}
+        for person in ausgewaehlteSpieler:
+            apiAusspuck = requests.get(
+                "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?",
+                params=self.paramsPerPerson[person])
+            gamesImBesitz = json.loads(apiAusspuck.content)
+            for game in gamesImBesitz["response"]["games"]:
+                if game["name"] in commonGames[0]:
+                    # hier kumulativ die spielstunden errechen!
+                    try:
+                        rankingListRecent[game["name"]]
+                    except KeyError:
+                        rankingListRecent[game["name"]] = 0
+                    try:
+                        rankingListRecent[game["name"]] = rankingListRecent[game["name"]] + game["playtime_2weeks"]
+                    except KeyError:
+                        pass
+
+                    try:
+                        rankingListEver[game["name"]]
+                    except KeyError:
+                        rankingListEver[game["name"]] = 0
+                    try:
+                        rankingListEver[game["name"]] = rankingListEver[game["name"]] + game["playtime_forever"]
+                    except KeyError:
+                        pass
+        rankingListRecent = dict(sorted(rankingListRecent.items(), key=lambda item: item[1], reverse=True))
+        rankingListEver = dict(sorted(rankingListEver.items(), key=lambda item: item[1], reverse=True))
+        for game in commonGames[0]:
+            try:
+                rankingListEver[game]
+            except KeyError:
+                rankingListEver[game] = 120*len(ausgewaehlteSpieler)
+            try:
+                rankingListRecent[game]
+            except KeyError:
+                rankingListRecent[game] = 120*len(ausgewaehlteSpieler)
+
+        if recent:
+            return [rankingListRecent, commonGames[1]]
+        else:
+            return [rankingListEver, commonGames[1]]
+
+
+
+
 
 """
 ------------------------Testcode Unter dieser Linie--------------------------------------------------------------------
 """
 
-"""
+#"""
 spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
-spieleDaten.editAnzahlSpieler("Contagion", 0)
+#spieleDaten.editAnzahlSpieler("Contagion", 0)
+spieleDaten.getRankedGames(["Manu", "Jan","Maido", "Felix"])
 spieleDaten.save()
-"""
+#"""
+
 #gewichten
 #is installed in API?
 
