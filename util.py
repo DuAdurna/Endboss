@@ -4,11 +4,6 @@ import time
 from colorama import Fore, Style
 import pyperclip
 
-
-# print(list(spieleDaten.games.values()))
-# print(Fore.BLUE + str(str((list(spiele.games.values())[-1])).rsplit(',1)[0]).split(':',1)[1])
-#  print(Fore.RED + ("Game " + str(counter) + " von " + str(len(masterGameList)) + " wurde hinzugefuegt&quot)
-# print(Style.RESET_ALL)
 class gameData:
     """gmae Data ist eine Liste der SPiele für die Daten gesammelt werden. Diese werden aus einem File geladen und da
     wieder rein gepackt. zusätzlich kann für eine gegebene AppId der steam API ein Game Nachgeschaut werden und falls
@@ -46,6 +41,7 @@ class gameData:
             "Leon": 76561198052633626,
             "Kilian": 76561198059004685,
             "Moritz": 76561198097568563,
+            "Paul": 76561198279221273,
         }
 
     def giveGames(self):
@@ -170,8 +166,7 @@ class gameData:
         remoteplayGames.sort()
         return [gemeinsamGames, remoteplayGames]
 
-    def updateGameData(self,ausgewaehlteSpieler=["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon",
-                                            "Kilian"]):
+    def updateGameData(self,ausgewaehlteSpieler=["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon", "Kilian"," Paul"]):
         """ Lädt die Spiele in die Daten rein, bzw updatet sie"""
         mnu = "Manu"
         jan = "Jan"
@@ -181,11 +176,10 @@ class gameData:
         flx = "Felix"
         dom = "Dome"
         mtz = "Moritz"
-        all = [smn, flx, max, jan, mnu, mad, dom, "Leon", "Kilian", mtz]
+        all = [smn, flx, max, jan, mnu, mad, dom, "Leon", "Kilian", mtz, "Paul"]
         self.addGameByHand([mnu, dom, mad, flx], "Dying Light", 4)
         self.addGameByHand([mnu, mad, flx, smn, max, jan], "Overwatch", 6)
         self.addGameByHand([mnu, mad, mtz, jan, flx, smn], "League of Legends", 5)
-        self.addGameByHand([mad], "Factorio", 99)
         self.addGameByHand(all, "Minecraft", 99)
         self.addGameByHand(all, "Geoguesser/Geotastic", 99)
         self.addGameByHand(all, "Gartic Phone", 15)
@@ -338,21 +332,12 @@ class gameData:
         else:
             return [rankingListEver, remoterankingListEver]
 
-
-
-
-
 """
 ------------------------Testcode Unter dieser Linie--------------------------------------------------------------------
 """
 
 """
 spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
-#spieleDaten.editAnzahlSpieler("Contagion", 0)
+spieleDaten.updateGameData(["Paul"])
 spieleDaten.save()
 """
-
-#gewichten
-#is installed in API?
-
-

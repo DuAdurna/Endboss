@@ -37,6 +37,7 @@ g = tk.IntVar()
 h = tk.IntVar()
 i = tk.IntVar()
 j = tk.IntVar()
+k = tk.IntVar()
 x = tk.IntVar()
 y = tk.IntVar()
 z = tk.IntVar()
@@ -44,14 +45,12 @@ z = tk.IntVar()
 ausgewaehlteSpieler = []
 
 # Create a frame for the Checkbuttons
-checkframe = ttk.LabelFrame(root, text='Spieler', width=210, height=460)
+checkframe = ttk.LabelFrame(root, text='Spieler', width=210, height=500)
 checkframe.place(x=20, y=12)
 
 
 # Callback function for Checkbuttons
 def buttonCallback(value):
-    # if(manu[0].get() == 1):
-    #     print('Manu callback')
     if a.get() == 1:
         if value == 1:
             if "Manu" not in ausgewaehlteSpieler:
@@ -118,7 +117,6 @@ def buttonCallback(value):
             if "Moritz" in ausgewaehlteSpieler:
                 ausgewaehlteSpieler.remove("Moritz")
 
-    #Leon und kilian spielen so selten mit uns, hab die eher aus testzwecken hinzugefügt
     if i.get() == 1:
         if value == 9:
             if "Leon" not in ausgewaehlteSpieler:
@@ -137,12 +135,14 @@ def buttonCallback(value):
             if "Kilian" in ausgewaehlteSpieler:
                 ausgewaehlteSpieler.remove("Kilian")
 
-    #
-    # if (b.get() == 1):
-    #     print('Jan callback')
-    #     ausgewaehlteSpieler.append("Jan")
-    #
-    #
+    if k.get() == 1:
+        if value == 11:
+            if "Paul" not in ausgewaehlteSpieler:
+                ausgewaehlteSpieler.append("Paul")
+    if k.get() == 0:
+        if value == 11:
+            if "Paul" in ausgewaehlteSpieler:
+                ausgewaehlteSpieler.remove("Paul")
     print(ausgewaehlteSpieler)
 
 
@@ -177,6 +177,8 @@ check9.place(x=20, y=340)
 check10 = ttk.Checkbutton(checkframe, text='Kilian',variable=j,command=lambda: buttonCallback(10))
 check10.place(x=20, y=380)
 
+check11 = ttk.Checkbutton(checkframe, text='Paul',variable=k,command=lambda: buttonCallback(11))
+check11.place(x=20, y=420)
 
 # Create a frame for the Treeview
 treeFrame = ttk.Frame(root)
@@ -216,7 +218,6 @@ def accentCallback():
         spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
         DATA = spieleDaten.getRankedGames(ausgewaehlteSpieler,False) #wenn hier false steht wird gesamtspielzeit als ranking genutzt
         insertData(DATA)
-        print(DATA)
         if (z.get() == 1):
             button = ttk.Button(root, text='Copy Games', command=lambda: copyGamestoCB(DATA))
             button.place(x=600, y=320)
