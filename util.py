@@ -336,8 +336,8 @@ class gameData:
 ------------------------Testcode Unter dieser Linie--------------------------------------------------------------------
 """
 
-"""
+#"""
 spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
-spieleDaten.updateGameData(["Paul"])
+spieleDaten.spielerAnzahlEintragen()
 spieleDaten.save()
-"""
+#"""

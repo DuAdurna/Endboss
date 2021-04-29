@@ -216,7 +216,7 @@ def copyGamestoCB(*data):
 def accentCallback():
     if ausgewaehlteSpieler:
         spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
-        DATA = spieleDaten.getRankedGames(ausgewaehlteSpieler,False) #wenn hier false steht wird gesamtspielzeit als ranking genutzt
+        DATA = spieleDaten.getRankedGames(ausgewaehlteSpieler,True) #wenn hier false steht wird gesamtspielzeit als ranking genutzt
         insertData(DATA)
         if (z.get() == 1):
             button = ttk.Button(root, text='Copy Games', command=lambda: copyGamestoCB(DATA))
