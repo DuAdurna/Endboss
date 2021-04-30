@@ -1,9 +1,8 @@
 import requests
 import json
 import time
-from colorama import Fore, Style
 import pyperclip
-import tkinter as tk
+
 
 class gameData:
     """gmae Data ist eine Liste der SPiele für die Daten gesammelt werden. Diese werden aus einem File geladen und da
@@ -183,7 +182,7 @@ class gameData:
         all = [smn, flx, max, jan, mnu, mad, dom, "Leon", "Kilian", mtz, "Paul"]
         self.addGameByHand([mnu, dom, mad, flx], "Dying Light", 4)
         self.addGameByHand([mnu, mad, flx, smn, max, jan], "Overwatch", 6)
-        self.addGameByHand([mnu, mad, mtz, jan, flx, smn], "League of Legends", 5)
+        self.addGameByHand([mnu, mad, mtz, jan, flx, smn, "Paul", "Leon", "Kilian"], "League of Legends", 5)
         self.addGameByHand(all, "Minecraft", 99)
         self.addGameByHand(all, "Geoguesser/Geotastic", 99)
         self.addGameByHand(all, "Gartic Phone", 15)

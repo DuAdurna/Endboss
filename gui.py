@@ -227,7 +227,6 @@ def accentCallback():
         if (z.get() == 1):
             button = ttk.Button(root, text='Copy Games', command=lambda: copyGamestoCB(DATA), width = 12)
             button.place(x=treex+200, y=320)
-
     else:
         z.set(0)
 
@@ -237,8 +236,12 @@ def copyGamestoCB(*data):
 
 def updateGames():
     spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
-    spieleDaten.updateGameData()
-    spieleDaten.spielerAnzahlEintragen()
+    try:
+        spieleDaten.updateGameData()
+        spieleDaten.spielerAnzahlEintragen()
+        spieleDaten.save()
+    except PermissionError:
+        print("Für Updates evtl mit Admin rechten starten oder UAC runter :-)")
 
 def addGameByHand():
     spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
