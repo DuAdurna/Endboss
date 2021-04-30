@@ -1,4 +1,5 @@
 # Importing tkinter,tkinter.ttk and utilities
+import sys
 import tkinter as tk
 from tkinter import ttk
 from util import gameData
@@ -6,10 +7,10 @@ import pyperclip
 
 # Create the window
 root = tk.Tk()
-root.title('Was wollen wir spielen?')
+root.title('Endboss - Was wollen wir spielen?')
 
 # Place the window in the center of the screen
-windowWidth = 800
+windowWidth = 650
 windowHeight = 530
 screenWidth = root.winfo_screenwidth()
 screenHeight = root.winfo_screenheight()
@@ -38,11 +39,16 @@ h = tk.IntVar()
 i = tk.IntVar()
 j = tk.IntVar()
 k = tk.IntVar()
+w = tk.IntVar()
 x = tk.IntVar()
 y = tk.IntVar()
 z = tk.IntVar()
 
 ausgewaehlteSpieler = []
+sortierModus = tk.BooleanVar()
+sortierModus.set(True)
+sortierName = tk.StringVar()
+sortierName.set("Sortiert nach der Spielzeit der letzten 2 Wochen")
 
 # Create a frame for the Checkbuttons
 checkframe = ttk.LabelFrame(root, text='Spieler', width=210, height=500)
@@ -143,7 +149,6 @@ def buttonCallback(value):
         if value == 11:
             if "Paul" in ausgewaehlteSpieler:
                 ausgewaehlteSpieler.remove("Paul")
-    print(ausgewaehlteSpieler)
 
 
 # Checkbuttons
@@ -181,8 +186,9 @@ check11 = ttk.Checkbutton(checkframe, text='Paul',variable=k,command=lambda: but
 check11.place(x=20, y=420)
 
 # Create a frame for the Treeview
+treex = 250
 treeFrame = ttk.Frame(root)
-treeFrame.place(x=420, y=21)  # hehe <-- Nice :D
+treeFrame.place(x=treex, y=21)  # hehe <-- Nice :D <-- leider nimmer nice wegen der neuen buttons
 
 # Scrollbar
 treeScroll = ttk.Scrollbar(treeFrame)
@@ -191,7 +197,7 @@ treeScroll.pack(side='right', fill='y')
 # Treeview setup
 treeview = ttk.Treeview(treeFrame, selectmode="extended", height=12)
 treeview.pack()
-treeview.column("#0", width=333)
+treeview.column("#0", width=360)
 treeview.heading("#0", text="DAS wollen wir spielen", anchor='center')
 
 
@@ -216,11 +222,11 @@ def copyGamestoCB(*data):
 def accentCallback():
     if ausgewaehlteSpieler:
         spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
-        DATA = spieleDaten.getRankedGames(ausgewaehlteSpieler,True) #wenn hier false steht wird gesamtspielzeit als ranking genutzt
+        DATA = spieleDaten.getRankedGames(ausgewaehlteSpieler,sortierModus.get()) #wenn hier false steht wird gesamtspielzeit als ranking genutzt
         insertData(DATA)
         if (z.get() == 1):
-            button = ttk.Button(root, text='Copy Games', command=lambda: copyGamestoCB(DATA))
-            button.place(x=600, y=320)
+            button = ttk.Button(root, text='Copy Games', command=lambda: copyGamestoCB(DATA), width = 12)
+            button.place(x=treex+200, y=320)
 
     else:
         z.set(0)
@@ -229,9 +235,63 @@ def accentCallback():
 def copyGamestoCB(*data):
     pyperclip.copy(str(data))
 
+def updateGames():
+    spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
+    spieleDaten.updateGameData()
+    spieleDaten.spielerAnzahlEintragen()
+
+def addGameByHand():
+    spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
+    spielerAuswahlen = input("Spieler sind: "+ str(ausgewaehlteSpieler) + " stimmt das so? Bitte mit \"ja\" bestätigen:")
+    if spielerAuswahlen == "ja":
+        player = ausgewaehlteSpieler
+    else:
+        print("Es wurde nichts Hinzugefügt")
+        return
+    name = input("Spiel Name bitte eingeben: ")
+    numSpieler = int(input("Anzahl der Spieler bitte eingeben: "))
+    gameId = int(input("Bitte falls vorhanden die Game ID eingeben, falls hier keine zahl ist bitte leer lassen:  "))
+    if gameId == "":
+        gameId = "Keine Game ID spezifiziert"
+
+    abfrage = input("Es wird also für die Spieler: " + str(player) +
+          " das Spiel: " + str(name) +
+          " mit einer Spieleranzahl von: " +  str(numSpieler) +
+          " und der Game Id: " + str(gameId) +
+          " hinzugefügt. Stimmen diese daten mit \"ja\" bestätigen: ")
+    if gameId == "Keine Game ID spezifiziert":
+        gameId = None
+    if abfrage == "ja":
+        spieleDaten.addGameByHand(player, gameName=name, spielerAnzahl=numSpieler, gameID=gameId)
+        spieleDaten.save()
+    else:
+        print("Es wurde, wegen nicht erfolgter Bestätigung, kein Spiel hinzugefügt")
+
+def sortSwitch():
+    if sortierModus.get():
+        sortierModus.set(False)
+        sortierName.set("Sortiert nach der Gesamtspielzeit")
+    else:
+        sortierModus.set(True)
+        sortierName.set("sortiert anche der Spielzeit der letzten 2 Wochen")
+
+
+
 
 # AccentButton
-accentbutton = ttk.Checkbutton(root, text='Gib Games', style='AccentButton', variable=z, command=accentCallback)
-accentbutton.place(x=700, y=320)
+accentbutton = ttk.Checkbutton(root,text='Gib Games',style='AccentButton',variable=z,width=12,command=accentCallback)
+accentbutton.place(x=treex+300, y=320)
+
+#Update button
+updateButton = ttk.Button(root, text="Update Spiele", command=updateGames,width = 12)
+updateButton.place(x=treex+100,y=320)
+
+#Add Game by hand Button
+addGameButton = ttk.Button(root, text='Add Game', command=addGameByHand, width = 12)
+addGameButton.place(x=treex,y=320)
+
+#toggle von sortierung als button
+sortierArt = ttk.Checkbutton(root, textvariable=sortierName, style= "Switch", command=sortSwitch, variable=w)
+sortierArt.place(x=treex, y=360)
 
 root.mainloop()

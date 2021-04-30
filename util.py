@@ -3,6 +3,7 @@ import json
 import time
 from colorama import Fore, Style
 import pyperclip
+import tkinter as tk
 
 class gameData:
     """gmae Data ist eine Liste der SPiele für die Daten gesammelt werden. Diese werden aus einem File geladen und da
@@ -100,7 +101,7 @@ class gameData:
         with open(failDataName, "w") as failDataDatei:
             json.dump(self.faillist, failDataDatei)
 
-    def addGameByHand(self, player, gameName=None, spielerAnzahl=None):
+    def addGameByHand(self, player,gameName=None, spielerAnzahl=None, gameID=None):
         """AddGameByHand soll der Liste ein spiel hinzufügen, obwohl dieses nicht bei Steam ist! wichtig ist hier,
         dass wir das ganze so gestalten dass wir Datenqualität haben und """
         if player is None:
@@ -109,12 +110,15 @@ class gameData:
         if gameName is None:
             print("Please select a Game")
             return
+        if gameID is None:
+            #Please select a game id, if none present, Endboss uses the name!
+            gameID = gameName
         for spieler in player:
             try:
                 self.games[spieler]
             except KeyError:
                 self.games[spieler] = {}
-            self.games[spieler][gameName] = {
+            self.games[spieler][gameID] = {
                 "name": gameName,
                 "mPlayer": True,
                 "remotePlay": False,
@@ -166,7 +170,7 @@ class gameData:
         remoteplayGames.sort()
         return [gemeinsamGames, remoteplayGames]
 
-    def updateGameData(self,ausgewaehlteSpieler=["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon", "Kilian"," Paul"]):
+    def updateGameData(self,ausgewaehlteSpieler=["Manu", "Jan", "Simon", "Max", "Maido", "Felix", "Dome", "Moritz", "Leon", "Kilian","Paul"]):
         """ Lädt die Spiele in die Daten rein, bzw updatet sie"""
         mnu = "Manu"
         jan = "Jan"
@@ -183,7 +187,6 @@ class gameData:
         self.addGameByHand(all, "Minecraft", 99)
         self.addGameByHand(all, "Geoguesser/Geotastic", 99)
         self.addGameByHand(all, "Gartic Phone", 15)
-
         persGameList = self.genPersGameList(ausgewaehlteSpieler)
         gcounter = 0
         glange = 0
@@ -194,14 +197,14 @@ class gameData:
             counter = 1
             for game in persGameList[person]:
                 self.addGame(game, person)
-                print(Fore.BLUE + list(self.games[person].values())[-1]["name"])
-                print(Fore.RED + "index: " + str(counter) + " (" + str(gcounter + counter) + ")"
+                print(list(self.games[person].values())[-1]["name"])
+                print("index: " + str(counter) + " (" + str(gcounter + counter) + ")"
                       + " von " + str(len(persGameList[person])) + " (" + str(glange) + ") von " +
-                      person + "\n" + Style.RESET_ALL)
+                      person + "\n" )
                 counter = counter + 1
                 if (gcounter + counter) % 53 == 0 or (time.time() - start) > 20:
                     self.save()
-                    print(Fore.GREEN + "ich habe zwischengespeichert" + Style.RESET_ALL)
+                    print("ich habe zwischengespeichert")
                     start = time.time()
             gcounter = gcounter + counter
         self.save()
@@ -336,7 +339,7 @@ class gameData:
 ------------------------Testcode Unter dieser Linie--------------------------------------------------------------------
 """
 
-#"""
+"""
 spieleDaten = gameData(gameDataFile="gameData.json", failDataFile="requestFails.json")
 spieleDaten.spielerAnzahlEintragen()
 spieleDaten.save()
