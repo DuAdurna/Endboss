@@ -275,7 +275,7 @@ def sortSwitch():
         sortierName.set("Sortiert nach der Gesamtspielzeit")
     else:
         sortierModus.set(True)
-        sortierName.set("sortiert anche der Spielzeit der letzten 2 Wochen")
+        sortierName.set("Sortiert nach der Spielzeit der letzten 2 Wochen")
 
 
 
