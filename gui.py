@@ -250,9 +250,11 @@ def addGameByHand():
         return
     name = input("Spiel Name bitte eingeben: ")
     numSpieler = int(input("Anzahl der Spieler bitte eingeben: "))
-    gameId = int(input("Bitte falls vorhanden die Game ID eingeben, falls hier keine zahl ist bitte leer lassen:  "))
+    gameId = input("Bitte falls vorhanden die Game ID eingeben, falls hier keine zahl ist bitte leer lassen:  ")
     if gameId == "":
         gameId = "Keine Game ID spezifiziert"
+    else:
+        gameId=int(gameId)
 
     abfrage = input("Es wird also für die Spieler: " + str(player) +
           " das Spiel: " + str(name) +
