@@ -28,7 +28,7 @@ class gameData:
             self.faillist = []
 
         # Api Key der Person, von der der Zugriff ausgeht
-        self.key = "01B5B710F0BE9A09BF1E010E5EA38374"
+        self.key = "1EB3549A4CF22E85EF4D96DE8E8F565E"
         # Steamids der Freunde
         self.steamIds = {
             "Jan": 76561198055057775,
@@ -56,7 +56,7 @@ class gameData:
         except KeyError:
             # schaue daten über app in steam api nach.
             parameter = {"appids": str(appId)}
-            gameAPIRequest = requests.get("https://store.steampowered.com/api/appdetails/?", params=parameter)
+            gameAPIRequest = requests.get("http://store.steampowered.com/api/appdetails/?", params=parameter)
             gameApiOut = json.loads(gameAPIRequest.content)
             if gameApiOut[str(appId)]["success"] == False:
                 print(str(appId) + " hat gefailt, das kann erwartet sein!")

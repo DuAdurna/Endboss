@@ -1,0 +1,4 @@
+Erst mit cmd den command:
+pyinstaller --onefile gui.py
+Laufen lassen dannn die entstandene Exe endboss nennen und in einen Ordner mit azure-dark(ordner) azure-dark.tcl, endboss.exe, gameData.json, requestFails.json, util.pyinstallerDas packen zu zip
+mit NSIS nusllsoft aus zip den Installer bilden,  fertig :)
